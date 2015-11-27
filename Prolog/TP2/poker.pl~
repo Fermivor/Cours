@@ -395,7 +395,7 @@ brelan(main(C1,C2,C3,C4,C5)).
 	C5 = carte(_201, _205)
 	Yes (0.00s cpu, solution 3)
 
-brelan((main(carte(deux,trefle),carte(deux,coeur),carte(trois,pique),carte(quatre,pique),C5))).
+brelan(est_main_triee(main(carte(deux,trefle),carte(deux,coeur),carte(trois,pique),carte(quatre,pique),C5))).
 
 	No (0.00s cpu)
 
