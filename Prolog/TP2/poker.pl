@@ -1,5 +1,12 @@
-% Septembre 2012
-% TP2 TERMES CONSTRUITS - A compléter et faire tourner sous Eclipse Prolog
+/*
+ * TP2 - Manipulation de termes contruits
+ * 
+ * @author Florentin Hortet
+ *@author Etienne Geantet
+ *@version Annee scolaire 2015/2016
+ * 
+ * 
+ */
 % ==============================================================================
 % ============================================================================== 
 %	["/home-reseau/fhortet/Prolog/Cours/Prolog/TP2/poker.pl"].

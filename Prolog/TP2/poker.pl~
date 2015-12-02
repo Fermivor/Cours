@@ -1,5 +1,12 @@
-% Septembre 2012
-% TP2 TERMES CONSTRUITS - A compléter et faire tourner sous Eclipse Prolog
+/*
+ * TP2 - Manipulation de termes contruits
+ * 
+ * @author Florentin Hortet
+ *@author Etienne Geantet
+ *@version Annee scolaire 2015/2016
+ * 
+ * 
+ */
 % ==============================================================================
 % ============================================================================== 
 %	["/home-reseau/fhortet/Prolog/Cours/Prolog/TP2/poker.pl"].
@@ -395,7 +402,7 @@ brelan(main(C1,C2,C3,C4,C5)).
 	C5 = carte(_201, _205)
 	Yes (0.00s cpu, solution 3)
 
-brelan(est_main_triee(main(carte(deux,trefle),carte(deux,coeur),carte(trois,pique),carte(quatre,pique),C5))).
+brelan((main(carte(deux,trefle),carte(deux,coeur),carte(trois,pique),carte(quatre,pique),C5))).
 
 	No (0.00s cpu)
 

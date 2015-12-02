@@ -164,7 +164,7 @@ Yes
 */
 
 /* tous_diff(+X) : les éléments de la liste X sont tous différents. */
-/* on suppose que la liste n'est pas vide*/
+/* on suppose la liste de plus d'un élément*/
 tous_diff([Flist]).
 tous_diff([FList|RList]):-
 		diff(FList,RList,RList).
@@ -183,12 +183,3 @@ No
 
 tous_diff([2,2,2]).
 No
-*/
-
-/* conc3(+X,+Y,+Z, ?T) : T est la concaténation des listes X, Y et Z. */
-conc3([],[],Z,Z).
-conc3([],[Y|RY],Z):-
-
-
-
-/* On en était là après 2H */
