@@ -410,5 +410,8 @@ false.
 
 26 ?- union_ens([1,2,3],[1,2,4],[1,2,3,4]).
 false.
+Ce cas devrait marcher mais ce n'est pas le cas ici car lors de la concatenation de [1,2,3] et [1,2,4]
+on obtient [3,1,2,4] et non pas [1,2,3,4]. Pour résoudre ce probleme on devrait utiliser un prédicat
+qui vérifie l'égalité ensembliste des listes.
 
 */		
