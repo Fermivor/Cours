@@ -78,99 +78,33 @@ livraison(f4, p1, 300).
 
 /* 2.1 : Sélection */
 
-/*piece(X,Y,lyon).*/
+piece_lyon(X):-
+			piece(X,_,lyon).
 
-/* Tests
-X = p1
-Y = tole
-Yes (0.00s cpu, solution 1, maybe more) ? ;
-X = p2
-Y = jante
-Yes
-*/
 
 /* 2.2 : Projection */
 
-/*piece(_,X,Y).*/
+piece_info(X,Y):-
+			piece(_,X,Y).
 
-/* Test
-X = tole
-Y = lyon
-Yes
+			
 
-X = jante
-Y = lyon
-Yes
+/* Definition du predicat non */
 
-X = jante
-Y = marseille
-Yes 
-
-X = pneu
-Y = clermontFerrand
-Yes
-...
-*/
-
+non(P) :- P, !, fail.
+non(P).
+			
 /* 2.3 : Union, intersection et différence ensembliste */
-union(N,V):-
-	demandeFournisseur(N,V).
-union(N,V):-
-	fournisseurReference(_,N,V).
+
+union(Nom,Ville) :-
+    demandeFournisseur(Nom,Ville).
+
+union(Nom,Ville) :-
+    fournisseurReference(_,Nom,Ville),
+    non(demandeFournisseur(Nom,Ville)).
+	
 /* Test
-union(T,Y).
 
-T = dupont
-Y = lyon
-Yes (0.00s cpu, solution 1, maybe more) ? ;
-
-T = michel
-Y = clermontFerrand
-Yes (0.00s cpu, solution 2, maybe more) ? ;
-
-T = durand
-Y = lille
-Yes (0.00s cpu, solution 3, maybe more) ? ;
-
-T = dupond
-Y = lille
-Yes (0.00s cpu, solution 4, maybe more) ? ;
-
-T = martin
-Y = rennes
-Yes (0.00s cpu, solution 5, maybe more) ? ;
-
-T = smith
-Y = paris
-Yes (0.00s cpu, solution 6, maybe more) ? ;
-
-T = brown
-Y = marseille
-Yes (0.00s cpu, solution 7, maybe more) ? ;
-
-T = dupont
-Y = lyon
-Yes (0.00s cpu, solution 8, maybe more) ? ;
-
-T = durand
-Y = lille
-Yes (0.00s cpu, solution 9, maybe more) ? ;
-
-T = martin
-Y = rennes
-Yes (0.00s cpu, solution 10, maybe more) ? ;
-
-T = michel
-Y = clermontFerrand
-Yes (0.00s cpu, solution 11, maybe more) ? ;
-
-T = smith
-Y = paris
-Yes (0.00s cpu, solution 12, maybe more) ? ;
-
-T = brown
-Y = marseille
-Yes
 */
 
 
@@ -194,23 +128,9 @@ Yes
 ...
 */
 
-diffEnsembliste(N,V):-
-	demandeFournisseur(N,V),
-	fournisseurReference(_,N2,V2),
-	\==(N,N2).
-diffEnsembliste(N,V):-
-	demandeFournisseur(N,V),
-	fournisseurReference(_,N2,V2),
-	\==(V,V2).
-diffEnsembliste(N,V):-
-	fournisseurReference(_,N,V),
-	demandeFournisseur(N2,V2),
-	\==(N,N2).
-diffEnsembliste(N,V):-
-	fournisseurReference(_,N,V),
-	demandeFournisseur(N2,V2),
-	\==(V,V2).
-
+diffEnsembliste(Nom,Ville) :-
+    demandeFournisseur(Nom,Ville),
+    non(fournisseurReference(_,Nom,Ville)).
 
 /* Test
 diffEnsembliste(V,N).
@@ -222,9 +142,11 @@ No
 */
 
 /* 2.4 : Produit cartésien */
-prodCartesien(F1,N,V,F2,P,Q):-
-	fournisseurReference(F1, N, V),
-	livraison(F2,P,Q).
+prodCartesien(F1,Nom,Ville,F2,Piece,Qte):-
+	fournisseurReference(F1, Nom, Ville),
+	livraison(F2,Piece,Qte).
+	
+	
 /* Test
 prodCartesien(A,B,C,D,E,F).
 ...
@@ -239,11 +161,85 @@ Yes (0.01s cpu, solution 60)
 
 /* 2.5 : Jointure */
 
-jointure(F1,N,V,P,Q):-
-	fournisseurReference(F1,N,V),
-	livraison(F1,P,Q).
+jointure(F1,Nom,Ville,Piece,Qte):-
+	prodCartesien(F1,Nom,Ville,F1,Piece,Qte).
 
+/* Test
+*/
 
+jointure_plus350(F1,Nom,Ville,Piece,Qte):-
+    prodCartesien(F1,Nom,Ville,F1,Piece,Qte),
+    <(350,Qte).
+	
+/* Test jointure_plus350
+?- jointure_plus350(F,Nom,Ville,Piece,Qte).
+F = f4,
+Nom = michel,
+Ville = clermontFerrand,
+Piece = p4,
+Qte = 400 ;
+F = f6,
+Nom = brown,
+Ville = marseille,
+Piece = p5,
+Qte = 500 ;
+F = f6,
+Nom = brown,
+Ville = marseille,
+Piece = p6,
+Qte = 1000 ;
+false.	*/
+
+/* 2.6 division(-NumF)  */
+
+division(NumF) :-
+	findall(P,piece_lyon(P),ListePieceLyon),
+	division2(ListePieceLyon,NumF).
+division2([],_).
+division2([Tete|Reste], NumF) :-
+    livraison(NumF,Tete,_),
+    division2(Reste,NumF).
+  
+/* Test division 
+
+division(A).
+A = f1 ;
+A = f4.
+
+*/  
+
+/* 2.7 totalPiece(-Total,-NumF) */
+
+sommeListe([],0).
+sommeListe([Tete|Reste],Total) :-
+	sommeListe(Reste,Total2),
+	Total is Tete+Total2.
+
+totalPiece(Total,NumF) :-
+	fournisseurReference(NumF,_,_),
+	findall(Qte,livraison(NumF,_,Qte),ListeQte),
+	sommeListe(ListeQte,Total).
+
+/* Test totalPiece 
+
+sommeListe([1,2,4],A).
+A = 7.
+
+totalPiece(A,B).
+A = 600,
+B = f1 ;
+A = 200,
+B = f2 ;
+A = 200,
+B = f3 ;
+A = 1000,
+B = f4 ;
+A = 0,
+B = f5 ;
+A = 1800,
+B = f6.
+
+*/
 % ============================================================================= 
 % SECTION 3 : Au delà de l’algèbre relationnelle
 % ============================================================================= 
