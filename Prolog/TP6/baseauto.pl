@@ -244,14 +244,116 @@ B = f6.
 % SECTION 3 : Au delà de l’algèbre relationnelle
 % ============================================================================= 
 
+/* 3.1 requête permettant d’obtenir l’ensemble des composants et
+pièces nécessaires pour réaliser un composant, une voiture par exemple */
 
+ensemble_comp(Composant,Res) :-
+	findall(Piece,assemblage(Comp,Piece,_),EnsComp),
+	ensemble_comp2(EnsComp,ResF),
+	append(EnsComp,ResF,ResTmp),
+	ensemble_comp2(ResF,ResTmp2),
+	append(ResTmp,ResTmp2,Res).
 
+ensemble_comp2([],[]).
+ensemble_comp2([Fst|Rest], EnsComp) :-
+	findall(Piece,assemblage(Fst,Piece,_),Ens1),
+	ensemble_comp2(Rest,Ens2),
+	append(Ens1,Ens2,EnsComp).
 
+/* test ensemble_comp
 
-/*
-===============================================================================
-===============================================================================
- Tests
-===============================================================================
+ ensemble_comp(voiture,B).
+B = [porte, roue, moteur, tole, vitre, jante, pneu, piston, soupape].
+
 */
 
+/* 3.2 requête pour calculer le nombre de pièces total nécessaire à la
+construction d’un composant (voiture, moteur. . .) */
+
+nombre_piece(Comp,NbRes) :-
+	findall((Piece,Qte),assemblage(Comp,Piece,Qte),EnsComp),
+	nombre_piece_liste(EnsComp,Res),
+	somme_liste(Res,NbRes).
+
+nombre_piece_liste([],[]).
+
+nombre_piece_liste([(P,Qt)|Rest],Res) :-
+ 	findall((Piece,Qte),assemblage(P,Piece,Qte),[(A,B)|C]), %composant
+	multiplier_liste([(A,B)|C],Qt,EnsCompF),
+	nombre_piece_liste(Rest,Res1),
+	nombre_piece_liste(EnsCompF,Res2),
+	append(Res1,Res2,Res).
+
+nombre_piece_liste([(P,Qt)|Rest],Res) :-
+ 	findall((Piece,Qte),assemblage(P,Piece,Qte),[]), %objet final
+	nombre_piece_liste(Rest,Res2),
+	append([(P,Qt)],Res2,Res).
+
+multiplier_liste([],_,[]).
+
+multiplier_liste([(P,Qt)|Rest],Qte,[(P,Qtres)|ListRes]) :-
+	Qtres is *(Qt,Qte),
+	multiplier_liste(Rest,Qte,ListRes).
+		
+somme_liste([],0).
+
+somme_liste([(_,Qt)|Rest],Res) :-
+	somme_liste(Rest,Res2),
+	Res is +(Res2,Qt).
+
+/* Test nombre_piece 
+
+nombre_piece(moteur,R).
+R = 20.
+
+nombre_piece(voiture,R).
+R = 36 
+*/
+
+/* 3.3 requête pour calculer le nombre de voitures qu’il est possible
+de construire avec les quantités de pièces livrées */
+
+jointure_piece(NomPiece,Qte):-
+	piece(NumPiece,NomPiece,_),
+	livraison(_,NumPiece,Qte).
+
+/* quantité totale d'une pièce */
+nb_piece_dispo(NomPiece,Nb) :-
+	findall((NomPiece,Qte),jointure_piece(NomPiece,Qte),Res),
+	somme_liste(Res,Nb).
+
+/* quantité d'un composant nécessaire pour une voiture */
+nb_compo_pour_une_voiture(_,[],0).
+nb_compo_pour_une_voiture(Piece,[(Piece,Qte)|_],Qte).
+nb_compo_pour_une_voiture(PieceA,[(PieceB,_)|Reste],Qte) :-
+	\==(PieceA,PieceB),
+	nb_compo_pour_une_voiture(PieceA,Reste,Qte). 
+
+/* nombre de voiture possible pour un composant */
+nb_voiture_par_compo(Piece,Res) :-
+ 	nb_piece_dispo(Piece,Nb_piece_dispo),
+ 	nombre_piece_liste([(voiture,1)],ListeCompo),
+ 	nb_compo_pour_une_voiture(Piece,ListeCompo,Nb_piece_necessaire),
+	Res is //(Nb_piece_dispo,Nb_piece_necessaire).
+
+/* nombre de voiture possible pour une liste de composants */
+nb_voiture_liste([],0).
+nb_voiture_liste([A],Res) :-
+	nb_voiture_par_compo(A,Res),
+	!.
+nb_voiture_liste([A|B],Res) :-
+	nb_voiture_par_compo(A,Res1),
+	nb_voiture_liste(B,Res2),
+	Res is min(Res1,Res2).
+
+/*  */
+nb_voiture(Res) :-
+	findall(Piece,piece(_, Piece,_),ListePiece), %Il faudrait éliminer les doublons
+	nb_voiture_liste(ListePiece,Res).
+
+/* test nb_voiture 
+
+nb_voiture(Res).
+Res = 62 
+
+*/
