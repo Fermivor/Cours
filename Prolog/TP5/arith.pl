@@ -152,7 +152,10 @@ add_bin([Elem1|Rest1],[Elem2|Rest2],[Res|Suite],CarryIn):-
 /* predicat sub_bin(?X,Y,?Z) : différence de deux entiers en représentation binaire */
 sub_bin(X,Y,Z) :- 
 	add_bin(Z,Y,X).
-
+/* Test sub_bin
+sub_bin([0,1,1],[1],X).
+X = [1, 0, 1]
+*/
 
 /* predicat prod_bin(+X,+Y,-Z) : produit de deux entiers en représentation binaire */
 prod_bit(0,_,[]).
@@ -164,6 +167,17 @@ prod_bin([Elem|Rest],Y,Z) :-
 	prod_bit(Elem,Y,Res),
 	prod_bin(Rest,Y,Tmp),
 	add_bin(Res,[0|Tmp],Z).
+/* Test prob_bin
+prod_bin([],[1,1,1],X).
+X = []
+
+prod_bin([0,1],[1,1],X).
+X = [0, 1, 1]
+
+prod_bin([0,1,1],[1,1,1],X).
+X = [0, 1, 0, 1, 0, 1]
+*/
+
 
 /* predicat factorial_bin(+N,-Fact) : factoriel d'un entier en représentation binaire */
 factorial_bin([],[1]). 				%On ne sait pas comment matcher de façon générale avec [0],[0,0], etc.
@@ -172,7 +186,16 @@ factorial_bin(N,Fact) :-
 	sub_bin(N,[1],Res),
 	factorial_bin(Res,FactInt),
 	prod_bin(N,FactInt,Fact).
+/* Test factorial_bin
+factorial_bin([0,0,1],X).
+X = [0, 0, 0, 1, 1]
 
+factorial_bin([0,0,1],X).
+X = [0, 0, 0, 1, 1] = 24
+
+factorial_bin([],X).
+X = [1]
+*/
 
 /* factorialIs(+N,-Fact) : factorielle d'un entier avec utilisation du prédicat is */
 
@@ -182,7 +205,13 @@ factorialIs(N,Fact) :-
 	S is N-1,
 	factorialIs(S,Temp),
 	Fact is N*Temp.
+/* Test factorialIs
+factorialIs(6,X).
+X = 720
 
+factorialIs(0,X).
+X = 1
+*/
 
 	
 	
@@ -216,7 +245,14 @@ evaluate(eq(N1, M1), Res) :-
         ).
 
 evaluate(fun(X, Body), fun(X, Body)).
+/* Test evaluate
 
+evaluate(prod(6,5),X).
+X = 30
+
+evaluate(prod(sub(9,3),add(4,5)),X).
+X = 54
+*/
 
 fresh_variables(Expr, Res) :-
        fresh_variables(Expr, [], Res).

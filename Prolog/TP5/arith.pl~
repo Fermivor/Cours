@@ -127,19 +127,65 @@ add_bit(1, 0, 1, 0, 1).
 add_bit(1, 1, 0, 0, 1).
 add_bit(1, 1, 1, 1, 1).
 
-/* predicat add */
-addb(Op1,Op2,Sum):-add2(Op1,Op2,Sum,0).
-add2([],N,N,0).
-add2(N,[],N,0).
-add2([],N,R,1):-
-	add2([1],N,R,0).
-add2(N,[],R,1):-
-	add2(N,[1],R,0).
-add2([FN1|RN1],[FN2|RN2],[R|Res],CI):-
-	add_bit(FN1,FN2,CI,R,CO),
-	add2(RN1,RN2,Res,CO).
+/* predicat add_bin(?X,?Y,?Z) : somme de deux entiers en représentation binaire */
+add_bin(X,Y,Z) :-
+	add_bin(X,Y,Z,0). % on met la retenu à zero
+add_bin([],Y,Y,0).
+add_bin(X,[],X,0) :-
+	\==(X,[]).
+
+add_bin([],[],Res,1) :-
+	add_bin([1],[0],Res,0).
+
+add_bin([],Y,Res,1) :-
+	\==(Y,[]),
+	add_bin([1],Y,Res,0).
+
+add_bin(X,[],Res,1) :-
+	\==(X,[]),
+	add_bin(X,[1],Res,0).
+
+add_bin([Elem1|Rest1],[Elem2|Rest2],[Res|Suite],CarryIn):-
+	add_bit(Elem1,Elem2,CarryIn,Res,CarryOut),
+	add_bin(Rest1,Rest2,Suite,CarryOut).
+
+/* predicat sub_bin(?X,Y,?Z) : différence de deux entiers en représentation binaire */
+sub_bin(X,Y,Z) :- 
+	add_bin(Z,Y,X).
 
 
+/* predicat prod_bin(+X,+Y,-Z) : produit de deux entiers en représentation binaire */
+prod_bit(0,_,[]).
+prod_bit(1,Res,Res).
+
+prod_bin([],_,[]).
+
+prod_bin([Elem|Rest],Y,Z) :-
+	prod_bit(Elem,Y,Res),
+	prod_bin(Rest,Y,Tmp),
+	add_bin(Res,[0|Tmp],Z).
+
+/* predicat factorial_bin(+N,-Fact) : factoriel d'un entier en représentation binaire */
+factorial_bin([],[1]). 				%On ne sait pas comment matcher de façon générale avec [0],[0,0], etc.
+
+factorial_bin(N,Fact) :-
+	sub_bin(N,[1],Res),
+	factorial_bin(Res,FactInt),
+	prod_bin(N,FactInt,Fact).
+
+
+/* factorialIs(+N,-Fact) : factorielle d'un entier avec utilisation du prédicat is */
+
+factorialIs(0,1).
+factorialIs(N,Fact) :-
+	N>0,
+	S is N-1,
+	factorialIs(S,Temp),
+	Fact is N*Temp.
+
+
+	
+	
 /* Optional part */
 evaluate_numbers(N1, M1, N2, M2) :-
         evaluate(N1, N2),

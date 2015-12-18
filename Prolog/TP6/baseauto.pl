@@ -1,5 +1,5 @@
 /**
-TP 7 Base de Données Déductives (BDD) - Prolog
+TP 6 Base de Données Déductives (BDD) - Prolog
 
 @author Etienne GEANTET
 @author Florentin HORTET
