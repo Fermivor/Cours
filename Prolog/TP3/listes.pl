@@ -415,3 +415,11 @@ on obtient [3,1,2,4] et non pas [1,2,3,4]. Pour résoudre ce probleme on devrait
 qui vérifie l'égalité ensembliste des listes.
 
 */		
+premier([Fst|Rest],Fst).
+	
+construire([],Lr).
+construire([Fst|Rest],Lr):- construire2([Fst|Rest],Lr,[]).
+construire2([],Lr,Lr).
+construire2([Fst|Rest],Lr,[V|L]):-
+	premier(Fst,V),
+	construire2(Rest,Lr,L).
