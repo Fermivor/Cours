@@ -14,7 +14,7 @@
 
 /*Question 1.1*/
 
-make_pairs(U,[],[]).
+make_pairs(_,[],[]).
 make_pairs(U,[X|Y],Res):-
 	\==(U,X),
 	make_pairs(U,Y,Res1),	
@@ -32,12 +32,8 @@ make_all_pairs([F|R],Res):-
 
 /*Tests
 make_all_pairs([1,2],Res).
-
 Res = [likes(1, 2), likes(2, 1), likes(1, 1), likes(2, 2)]
-
-
 make_all_pairs([1,2,3],Res).
-
 Res = [likes(1, 3), likes(3, 1), likes(1, 2), likes(2, 1), likes(1, 1), likes(2, 3), likes(3, 2), likes(2, 2), likes(3, 3)]
 */	
 	
@@ -52,15 +48,11 @@ sub_list([_|R],RS):-
 	
 /* Tests
 sub_list([1,2],Res).
-
 Res = [1, 2]
 Res = [1]
 Res = [2]
 Res = []
-
-
 sub_list([1,2,3],Res).
-
 Res = [1, 2, 3]
 Res = [1, 2]
 Res = [1, 3]
@@ -72,11 +64,16 @@ Res = []
 */
 
 /*Question 1.3*/
+membre(M,[M|_]):-
+    !.
+membre(M,[_|Rest]):-
+    membre(M,Rest).
+
 
 proposition1(P):-
-	member(likes(dana,cody),P).
+	membre(likes(dana,cody),P).
 proposition2(P):-
-	not(member(likes(bess,dana),P)).
+	not(membre(likes(bess,dana),P)).
 proposition3(P):-
 	not(member(likes(cody,abby),P)).
 	
@@ -90,7 +87,7 @@ proposition4(P):-
 	
 p5([],_).
 p5([likes(X,bess)|Rest],Monde):-
-	member(likes(abby,X),Monde),
+	membre(likes(abby,X),Monde),
 	p5(Rest,Monde).
 p5([likes(_,Y)|Rest],Monde) :-
 	\==(Y,bess),
@@ -101,7 +98,7 @@ proposition5(P):-
 
 p6([],_).
 p6([likes(bess,X)|Reste],ListeLikes) :-
-	member(likes(dana,X),ListeLikes),
+	membre(likes(dana,X),ListeLikes),
 	p6(Reste,ListeLikes).
 p6([likes(Y,_)|Reste],ListeLikes) :-
 	\==(Y,bess),
@@ -111,26 +108,27 @@ proposition6(ListeLikes) :-
 	p6(ListeLikes,ListeLikes).
 
 p7([],_).
-p7([likes(F,X)|Rest],Monde):-
-	member(likes(F,_),Monde),
-	member(likes(X,_),Monde),
-	p7(Rest,Monde).
+p7([Mec|Res],Monde):-
+	membre(likes(Mec,_),Monde),
+	p7(Res,Monde).
 	
 proposition7(P):-
-	p7(P,P).
-	
+    people(X),
+	p7(X,P).
+people([cody,dana,bess,abby]).
 /* Tests	
-proposition7([likes(abby,dana),likes(cody,abby),likes(bess,cody),likes(cody,bess)]).
+propositi on7([likes(abby,dana),likes(cody,abby),likes(bess,cody),likes(cody,bess)]).
 No 
-
 proposition7([likes(abby,dana),likes(cody,abby),likes(bess,cody),likes(dana,bess)]).
 Yes 
 */
 
 /*Question 1.4*/
 
+       
 possible_worlds(Monde) :-
-        make_all_pairs([abby, bess, cody, dana],Res),
+    	people(X),
+        make_all_pairs(X,Res),
         sub_list(Res,Monde),
         proposition1(Monde),
         proposition2(Monde),
@@ -139,6 +137,16 @@ possible_worlds(Monde) :-
         proposition5(Monde),
         proposition6(Monde),
         proposition7(Monde).
+/* Test
+M = [likes(cody, dana), likes(dana, cody), likes(cody, cody), likes(dana, abby),
+    likes(abby, dana), likes(dana, dana), likes(bess, abby), likes(abby, bess), likes(abby, abby)]
+M = [likes(cody, dana), likes(dana, cody), likes(cody, cody), likes(dana, abby),
+    likes(abby, dana), likes(bess, abby), likes(abby, bess), likes(abby, abby)]
+M = [likes(cody, dana), likes(dana, cody), likes(dana, abby), likes(abby, dana),
+    likes(dana, dana), likes(bess, abby), likes(abby, bess), likes(abby, abby)]
+M = [likes(cody, dana), likes(dana, cody), likes(dana, abby), likes(abby, dana),
+    likes(bess, abby), likes(abby, bess), likes(abby, abby)]
+*/
 
 /*Question 1.6*/
 test_possible_worlds :-
@@ -149,6 +157,7 @@ test_possible_worlds :-
 possible_worlds2(Monde) :-
         make_all_pairs([abby, bess, cody, dana],Res),
         sub_list(Res,Monde),
+    
         proposition7(Monde),
         proposition4(Monde),
         proposition5(Monde),
@@ -157,8 +166,18 @@ possible_worlds2(Monde) :-
         proposition2(Monde),
         proposition3(Monde).
 
+/* Test
+M = [likes(abby, dana), likes(dana, abby), likes(abby, bess), likes(bess, abby),
+    likes(abby, abby), likes(cody, dana), likes(dana, cody), likes(cody, cody), likes(dana, dana)]
+M = [likes(abby, dana), likes(dana, abby), likes(abby, bess), likes(bess, abby),
+    likes(abby, abby), likes(cody, dana), likes(dana, cody), likes(cody, cody)]
+M = [likes(abby, dana), likes(dana, abby), likes(abby, bess), likes(bess, abby),
+    likes(abby, abby), likes(cody, dana), likes(dana, cody), likes(dana, dana)]
+M = [likes(abby, dana), likes(dana, abby), likes(abby, bess), likes(bess, abby),
+    likes(abby, abby), likes(cody, dana), likes(dana, cody)]
+*/
+
 test_possible_worlds2 :-
         possible_worlds2(World),
         writeln(World),
-        fail.		
-
+        fail.
